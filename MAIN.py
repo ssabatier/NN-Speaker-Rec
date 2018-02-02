@@ -198,7 +198,7 @@ else:
 # Show window
 # w.show()
 
-if choice_phase == 'train':
+if choice_phase == 'test':
     # Remove previous files
     if remove_status:
         if os.path.exists(DST_FOLDER_TRAIN):
@@ -223,19 +223,24 @@ ID_2015_RELATIONS = numpy.load('/home/stallone/Documents/PyCharm_Scripts/speech_
 relations = numpy.concatenate((ID_2014_RELATIONS, ID_2015_RELATIONS), axis=0)
 
 # Get the IDs
-ID_2014 = ID_2014_RELATIONS[:, 0].reshape(ID_2014_RELATIONS.shape[0], 1)
-ID_2015 = ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1)
+ID_2014_L = ID_2014_RELATIONS[:, 0].reshape(ID_2014_RELATIONS.shape[0], 1)
+ID_2014_R = ID_2014_RELATIONS[:, 1].reshape(ID_2014_RELATIONS.shape[0], 1)
+ID_2014 = numpy.concatenate((ID_2014_L,ID_2014_R),axis=0)
+ID_2015_L = ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1)
+ID_2015_R = ID_2015_RELATIONS[:, 1].reshape(ID_2015_RELATIONS.shape[0], 1)
+ID_2015 = numpy.concatenate((ID_2015_L,ID_2015_R),axis=0)
 
 # Get the ids for training .
-ID_2014_2015 = numpy.concatenate((ID_2014, ID_2015))
-ID_2014_2015 = numpy.unique(ID_2014_2015)
+# ID_2015_seen = numpy.intersect1d(ID_2014, ID_2015)
+# ID_2014_2015 = numpy.concatenate((ID_2014, ID_2015_seen),axis=0)
+# ID_2014_2015 = numpy.unique(ID_2014_2015)
 train_id = ID_2014.astype(int)[:, 0]
 train_id_list = train_id.tolist()  # Necessary for parallel computing
 
 # Get the ids for testing.
 test_id_2015_unseen = numpy.setdiff1d(ID_2015, numpy.intersect1d(ID_2014, ID_2015)).astype(int)
 test_id_2015_seen = numpy.intersect1d(ID_2014, ID_2015)
-test_id = test_id_2015_seen.astype(int)
+test_id = test_id_2015_unseen.astype(int)
 test_id_list = test_id.tolist()
 
 """
