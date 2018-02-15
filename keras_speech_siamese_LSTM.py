@@ -184,8 +184,9 @@ def create_siamese_LSTM(input_dim):
 """
 Part1: Input the data.
 """
-hf_train = h5py.File('TRAIN.hdf5', 'r')
-hf_test = h5py.File('TEST.hdf5', 'r')
+SRC_FOLDER = '/home/stallone/Documents/PyCharm_Scripts/speech_processing-master/5-CreateData/HDF5/'
+hf_train = h5py.File(SRC_FOLDER + 'TRAIN_raw.hdf5', 'r')
+hf_test = h5py.File(SRC_FOLDER + 'TEST_raw.hdf5', 'r')
 print('List of arrays: \n', hf_train.keys())
 tr_pairs = hf_train.get('pairs')
 tr_y = hf_train.get('labels')
@@ -198,7 +199,12 @@ te_y = hf_test.get('labels')
 
 # Training data shape of format of (Number of pairs(samples), 2, X1, X2)
 # X1: Probably temporal sequence, i.e., 100 successive frames.
-# X2: The features per windows: 6400 features means 400ms if the audio is samples at 16000Hz.
+# X2: The features per windows: 6400 features means 400ms if the audio is sampled at 16000Hz.
+# print ("Training Tensors:", hf_train.shape)
+# print ("Testing Tensors:", hf_test.shape)
+tr_pairs = np.transpose(tr_pairs, (0, 2, 1, 3))
+te_pairs = np.transpose(te_pairs, (0, 2, 1, 3))
+print ("Training Pairs:", tr_pairs.shape)
 print ("Training shape:", tr_y.shape)
 
 # Turn into numpy arrays for processing.
@@ -208,15 +214,18 @@ tr_y = np.array(tr_y)
 te_y = np.array(te_y)
 
 # Required parameters.
-input_dim = 6400
+input_dim = 1
+frames = 6400
 nb_epoch = 5
 
 # network definition
 base_network = create_siamese_LSTM(input_dim)
 
 # Place holders.
-input_a = Input(shape=(6400, 1))
-input_b = Input(shape=(6400, 1))
+# input_a = Input(shape=(6400, 1))
+# input_b = Input(shape=(6400, 1))
+input_a = Input(shape=(input_dim*frames, 1))
+input_b = Input(shape=(input_dim*frames, 1))
 
 # Output from two identical networks.
 processed_a = base_network(input_a)

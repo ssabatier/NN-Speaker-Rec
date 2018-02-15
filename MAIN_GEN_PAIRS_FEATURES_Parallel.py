@@ -19,8 +19,6 @@ import shutil
 # Getting the number of cores: Necessary for parallel computing.
 num_cores = multiprocessing.cpu_count()
 
-
-
 # """
 # GUI for training or testing phase.
 # """
@@ -30,7 +28,7 @@ num_cores = multiprocessing.cpu_count()
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_phase = form.choice
-choice_phase = 'TRAIN'
+choice_phase = 'TEST'
 
 # # If user canceled the operation.
 # if choice_phase == 'Cancel':
@@ -44,7 +42,7 @@ choice_phase = 'TRAIN'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_feature = form.choice
-choice_feature = 'MFEC'
+choice_feature = 'raw'
 
 # """
 # GUI for getting the session.
@@ -56,10 +54,10 @@ choice_feature = 'MFEC'
 # choice = form.choice
 # if choice == 'Speech_Aligned':
 #     speech_aligned = True
-#     print "speech_aligned correspond to ASR"
+#     print "speech_aligned corresponds to ASR"
 # elif choice == 'Speech_Not_Aligned':
 #     speech_aligned = False
-#     print "Speech_Not_Aligned correspond to Speaker Recognition"
+#     print "Speech_Not_Aligned corresponds to SRE"
 # else:
 #     sys.exit('cancelled by the user')
 speech_aligned = False
@@ -122,36 +120,44 @@ ID_2015_RELATIONS = numpy.load('/home/stallone/Documents/PyCharm_Scripts/speech_
 relations = numpy.concatenate((ID_2014_RELATIONS, ID_2015_RELATIONS), axis=0)
 
 # Get the IDs
-ID_2014 = ID_2014_RELATIONS[:, 0].reshape(ID_2014_RELATIONS.shape[0], 1)
-ID_2015 = ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1)
+ID_2014_L = ID_2014_RELATIONS[:, 0].reshape(ID_2014_RELATIONS.shape[0], 1)
+ID_2014_R = ID_2014_RELATIONS[:, 1].reshape(ID_2014_RELATIONS.shape[0], 1)
+ID_2014 = numpy.concatenate((ID_2014_L,ID_2014_R),axis=0)
+ID_2015_L = numpy.unique(ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1))
+ID_2015_R = numpy.unique(ID_2015_RELATIONS[:, 1].reshape(ID_2015_RELATIONS.shape[0], 1))
+ID_2015 = numpy.concatenate((ID_2015_L,ID_2015_R),axis=0)
 
 # Get the ids for training .
-ID_2014_2015 = numpy.vstack((ID_2014, ID_2015))
-ID_2014_2015 = numpy.unique(ID_2014_2015)
-train_id = ID_2014.astype(int)[:, 0]
-train_id_list = train_id.tolist()  # Necessary for parallel computing
+# ID_2014_2015 = numpy.vstack((ID_2014, ID_2015))
+# ID_2014_2015 = numpy.unique(ID_2014_2015)
+train_id_gen = ID_2014.astype(int)[:, 0]
+train_id_list_gen = train_id_gen.tolist()  # Necessary for parallel computing
+train_id_imp = ID_2014_L.astype(int)[:, 0]
+train_id_list_imp = train_id_imp.tolist()
 
 # Get the ids for testing.
 test_id_2015_unseen = numpy.setdiff1d(ID_2015, numpy.intersect1d(ID_2014, ID_2015)).astype(int)
 test_id_2015_seen = numpy.intersect1d(ID_2014, ID_2015)
-test_id = test_id_2015_seen.astype(int)
-test_id_list = test_id.tolist()
+test_id_2015_imp = numpy.setdiff1d(ID_2015_L, numpy.intersect1d(ID_2014_L, ID_2015_L)).astype(int)
+test_id_gen = test_id_2015_unseen.astype(int)
+test_id_list_gen = test_id_gen.tolist()
+test_id_imp = test_id_2015_imp.astype(int)
+test_id_list_imp = test_id_imp.tolist()
 
 id_set = [f for f in os.listdir(SRC_FOLDER) if os.path.isdir(os.path.join(SRC_FOLDER, f))]
 
 # TODO: Calling multiple processors for creating pairs
 if choice_phase == 'TEST':
-
-    Parallel(n_jobs=num_cores)(
-        delayed(Generate_Genuine)(ID, SRC_FOLDER, DST_FOLDER_TEST,
-                                  choice_phase, choice_feature, speech_aligned) for ID in test_id_list)
-    Parallel(n_jobs=num_cores)(
-        delayed(Generate_Impostor)(ID, id_set, relations, SRC_FOLDER, DST_FOLDER_TEST, choice_phase, choice_feature,
-                                   speech_aligned) for ID in test_id_list)
+    for ID in test_id_list_gen:
+        Generate_Genuine(ID, SRC_FOLDER, DST_FOLDER_TEST,
+                                  choice_phase, choice_feature, speech_aligned)
+    for ID in test_id_list_imp:
+        Generate_Impostor(ID, id_set, relations, SRC_FOLDER, DST_FOLDER_TEST, choice_phase, choice_feature,
+                                   speech_aligned)
 else:
-    for ID in train_id_list:
+    for ID in train_id_list_gen:
         Generate_Genuine(ID, SRC_FOLDER, DST_FOLDER_TRAIN,
                                   choice_phase, choice_feature, speech_aligned)
-    for ID in train_id_list:
+    for ID in train_id_list_imp:
         Generate_Impostor(ID, id_set, relations, SRC_FOLDER, DST_FOLDER_TRAIN, choice_phase, choice_feature,
                                    speech_aligned)

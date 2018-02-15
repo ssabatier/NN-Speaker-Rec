@@ -24,7 +24,7 @@ The procedure is as follows:
         for std-image calculation.
 
     2 - Now by feeding single by single file, the training and test data will be transformed to the new space.
-        * A model should be applied on unseen data which the assumption is that it is not available at the test time.
+        * A model should be applied on unseen data with the assumption that it is not available at the test time.
           So in order to get a practical estimate of the test data, the calculation of the normalization parameters
           (mean and variance) should be restricted to the training set.
 
@@ -101,7 +101,7 @@ GUI Class definition
 # task_title = 'Are you intended to create testing or training pairs?!'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
-choice_phase = 'TRAIN'
+choice_phase = 'TEST'
 #
 # # If user canceled the operation.
 # if choice_phase == 'Cancel':
@@ -111,10 +111,10 @@ choice_phase = 'TRAIN'
 # GUI for getting the type of features.
 # """
 # user_options = ['logfbank_energy', 'fbank_energy', 'MFCC', 'raw']
-# task_title = 'From which kind of features you want to create pairs?!'
+# task_title = 'From which kind of features do you want to create pairs?!'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
-choice_feature = 'MFEC'
+choice_feature = 'raw'
 
 # Source and destination paths(both with absolute path).
 this_path = os.path.dirname(os.path.abspath(__file__))
@@ -140,7 +140,7 @@ print("Number of folders = ", num_folders)
 num_files = subprocess.check_output('find ' + src_folder_path + ' -type f | wc -l', shell=True)
 
 # subprocess.check_output returns the number of files as '1518\n'. The last element '\n' must be
-# eliminated and it count only 1 character in python.
+# eliminated and it counts only 1 character in python.
 num_files = int(num_files[:-1])
 
 # Print the number of files.

@@ -87,7 +87,7 @@ num_cores = multiprocessing.cpu_count()
 # task_title = 'Are you intended to create testing or training pairs?!'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
-choice_phase = 'train'
+choice_phase = 'test'
 #
 # # If user canceled the operation.
 # if choice_phase == 'Cancel':
@@ -100,7 +100,7 @@ choice_phase = 'train'
 # task_title = 'From which kind of features you want to create pairs?!'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
-choice_feature = 'MFEC'
+choice_feature = 'raw'
 #
 # """
 # GUI for getting the session.
@@ -161,14 +161,17 @@ if choice_phase == 'test':
 #     msg='What number of frames you want to use(it is determined base on the frame length and overlap)?',
 #     title='Extracting Features',
 #     default=98, lowerbound=0, upperbound=1000)
-number_frames = 98
+
+# number_frames is the number of frames or samples (for raw data) that we want cut to make cubes
+# Ex. for 16k sampling rate, number_frames = 6400 corresponds to 400 ms chunks of data
+number_frames = 6400
 
 # If the stride is equal to number_frames, then there is no overlap.
 # overlap_stride = integerbox(
 #     msg='What is the stride in the sense of having overlap)?',
 #     title='Extracting Features',
 #     default=number_frames, lowerbound=0, upperbound=1000)
-overlap_stride = 98
+overlap_stride = 6400
 
 """
 Part 2: Generating Pairs
@@ -198,7 +201,7 @@ else:
 # Show window
 # w.show()
 
-if choice_phase == 'test':
+if choice_phase == 'train':
     # Remove previous files
     if remove_status:
         if os.path.exists(DST_FOLDER_TRAIN):
@@ -226,8 +229,8 @@ relations = numpy.concatenate((ID_2014_RELATIONS, ID_2015_RELATIONS), axis=0)
 ID_2014_L = ID_2014_RELATIONS[:, 0].reshape(ID_2014_RELATIONS.shape[0], 1)
 ID_2014_R = ID_2014_RELATIONS[:, 1].reshape(ID_2014_RELATIONS.shape[0], 1)
 ID_2014 = numpy.concatenate((ID_2014_L,ID_2014_R),axis=0)
-ID_2015_L = ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1)
-ID_2015_R = ID_2015_RELATIONS[:, 1].reshape(ID_2015_RELATIONS.shape[0], 1)
+ID_2015_L = numpy.unique(ID_2015_RELATIONS[:, 0].reshape(ID_2015_RELATIONS.shape[0], 1))
+ID_2015_R = numpy.unique(ID_2015_RELATIONS[:, 1].reshape(ID_2015_RELATIONS.shape[0], 1))
 ID_2015 = numpy.concatenate((ID_2015_L,ID_2015_R),axis=0)
 
 # Get the ids for training .
@@ -242,6 +245,12 @@ test_id_2015_unseen = numpy.setdiff1d(ID_2015, numpy.intersect1d(ID_2014, ID_201
 test_id_2015_seen = numpy.intersect1d(ID_2014, ID_2015)
 test_id = test_id_2015_unseen.astype(int)
 test_id_list = test_id.tolist()
+# un_2014 = numpy.unique(ID_2014)
+# un_2015 = numpy.unique(ID_2015)
+# un_2015L = numpy.unique(ID_2015_L)
+# un_2015R = numpy.unique(ID_2015_R)
+# id_2015_overlap = numpy.intersect1d(ID_2015_L, ID_2015_R)
+
 
 """
 Get the sessions and return them as a list.
