@@ -69,7 +69,7 @@ def Generate_Cube(id, src_folder, dst_folder, years, choice_phase, choice_featur
 
                         # try:
                         # Number of stack is the number of stack of frames which form a block of data.
-                        # Example: A 1-second block of data almost have 98 frames and the number of
+                        # For example: A 1-second block of data almost have 98 frames and the number of
                         # 1-second block of data in the stacked signal equals to whole number of frames
                         # divided by the number of frames per block.
                         number_stack = int(numpy.floor(number_all_frames / number_frames))
@@ -80,7 +80,7 @@ def Generate_Cube(id, src_folder, dst_folder, years, choice_phase, choice_featur
                             frame_feature_cube = feature_cube[ :, :,i * overlap_stride: i * overlap_stride + number_frames]
                             print("frame_feature_cube.shape", frame_feature_cube.shape)
 
-                            # Save by the appropriate naming convention.
+                            # Save with the appropriate naming convention.
                             # if file_choice == 'rainbow':
                             numpy.save(os.path.join(dst_folder, id_folder,
                                                     choice_phase + '_' + choice_feature + '_' + 'cube' + '_' + str(
