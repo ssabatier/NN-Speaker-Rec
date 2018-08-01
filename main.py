@@ -13,7 +13,7 @@ import numpy as np
 # from PySide import QtGui, QtCore
 
 """
-This script does the mean subtraction and normalization on the data.
+This script does mean subtraction and normalization of the data.
 The procedure is as follows:
 
     1 - The previously generated files(cubes which created per data block(which can be 1sec slots)) will be loaded.
@@ -37,8 +37,6 @@ This file calls the following:
 """
 GUI Class definition
 """
-
-
 # class MyButtons(QtGui.QDialog):
 #     def __init__(self, choices, title):
 #         # Initialized and super call.
@@ -98,7 +96,7 @@ GUI Class definition
 # """
 # app = QtGui.QApplication(sys.argv)
 # user_options = ['TRAIN', 'TEST', 'Cancel', 'Continue']
-# task_title = 'Are you intended to create testing or training pairs?!'
+# task_title = 'Are you creating testing or training pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 choice_phase = 'TEST'
@@ -111,12 +109,12 @@ choice_phase = 'TEST'
 # GUI for getting the type of features.
 # """
 # user_options = ['logfbank_energy', 'fbank_energy', 'MFCC', 'raw']
-# task_title = 'From which kind of features do you want to create pairs?!'
+# task_title = 'Which features would you like to use?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 choice_feature = 'raw'
 
-# Source and destination paths(both with absolute path).
+# Source and destination paths(both with absolute path)
 this_path = os.path.dirname(os.path.abspath(__file__))
 src_origin = '/home/stallone/Documents/PyCharm_Scripts/speech_processing-master/2-CreateCubes/'
 path_preprocessing_file = src_origin + 'Preprocessing_Statistics'
@@ -132,7 +130,7 @@ num_folders = (
     len([name for name in os.listdir(src_folder_path) if os.path.isdir(os.path.join(src_folder_path, name))]))
 print("Number of folders = ", num_folders)
 
-# Get the number of all files in subdirectories
+# Get the number of all files in sub-directories
 # The simplest way to get the output of a command is to use the subprocess.check_output function.
 # However the output must be considered because it is the exact output of the terminal which
 # might be of type "string" and we may want "int". Use prong function for tracking.
@@ -150,23 +148,22 @@ print("Number of files", num_files)
 # RandFolder = random.choice(dircache.listdir(src_folder_path))
 RandFolder = folders[1]
 
-
 FileShape = np.load(glob.glob(os.path.join(src_folder_path, RandFolder, '*.npy'))[0]).shape
 # FileShape = (3,40,98)
 # FileShape = FileShape.reshape(numpy_array.shape[2],numpy_array.shape[1],numpy_array.shape[0])
 print("File shape: ", FileShape)
 
-# This part is specific for the feature cube of pairs that have been generated.
+# This part is specific for the feature cube of pairs that have been generated
 N = num_files
 X = np.zeros((N, FileShape[0], FileShape[1],FileShape[2]),
              dtype=np.float32)  # the number 2 is because the hog features of a pairs should be considered separately
 y = np.zeros(N, dtype=np.int64)  #
 FileNum = np.zeros(N, dtype=np.int64)
 
-# Creating random number for shuffling the files.
+# Create random number for shuffling the files
 Rand_idx = np.random.permutation(range(N))
 
-# Looping over all folders and files.
+# Loop over all folders and files
 # All the data is fed to the big X vector that has been created.
 # The shuffling of the data is done here before creating LMDB file.
 # Class labels are defined based on distinct folder names.
