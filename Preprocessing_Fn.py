@@ -18,21 +18,19 @@ The following functions are used for preprocessing the training data:
      # If using Scikit-learn is desired.
         Preprocessing_Scikit_Train: Mean subtraction + Scaling(normalization)
 '''
-
-
 def Zero_Mean_Numpy(X):
     '''
     Mean subtraction is the most common phase of preprocessing. It involves subtracting
     the mean of every individual feature in the data with the geometric interpretation
     of "centering the data around the origin in each dimension". In numpy, this operation
     would be implemented as: X -= np.mean(X, axis = 0) if the samples are within first
-    dimension(ex: data size:(N,D) in which N is the samples and D is the number of dimesnions).
+    dimension(ex: data size:(N,D) in which N is the samples and D is the number of dimensions).
     Considering speech specifically, it can be reasonable to subtract separately across the
     three channels(static,first and second order derivatives).
 
     :param X: The data cube.
-    :return: X: The zero mean data cub!
-             mean_array: The mean array which is the mean for each channel!
+    :return: X: The zero mean data cube
+             mean_array: The mean array which is the mean for each channel
     '''
     X_Preprocessed = np.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3]))
     mean_array = np.zeros((X.shape[1], X.shape[2], X.shape[3]))
@@ -43,10 +41,9 @@ def Zero_Mean_Numpy(X):
 
     return X_Preprocessed, mean_array
 
-
 def Normalization_Numpy(X):
     '''
-    "Normalization" refers to normalizing the data dimensions for being nearly in the same scale.
+    "Normalization" refers to normalizing the data dimensions to be nearly in the same scale.
     The most common way is to divide each dimension by its standard deviation, after it has been
     zero-centered: (X /= np.std(X, axis = 0)) again if the samples are within first  dimension.
     It makes sense to apply "Normalization" if you have there is a reason to believe that different
@@ -116,11 +113,7 @@ def Preprocessing_Scikit_Train(X, transform_status = False):
             # Changing the desired channel with the new processed data.
             X_Preprocessed[:, i, :, :] = X_Channel
 
-
-
     return mean_image, std_image, X_Preprocessed
-
-
 
 def TestData_Transfer_Fn(X, mean_image, std_image):
     '''
@@ -159,9 +152,3 @@ def File_Transfer_Fn(X, mean_image, std_image):
         X_Postprocess[i, :, :] = X_Postprocess[i, :, :] / std_image[i, :, :]
 
     return X_Postprocess
-
-
-
-
-
-
