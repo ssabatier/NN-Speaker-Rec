@@ -8,55 +8,52 @@ import scipy.io.wavfile as wav
 # from SPEECH_SIGNAL_PROCESSING import processing
 import speechpy
 
-
 def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, feature_type):
     """
-    This function get the ids and associated folders for generating features.
-    The output is as numpy arrays.
+    This function gets the ids and associated folders for generating features.
+    The outputs are numpy arrays.
 
     Arg:
-        id: The ids which we create feature upon them.
-        src_folder: The source folder for getting images
+        id: The ids from which we extract features
+        src_folder: The source folder for sound files
         dst_folder: The destination folder for saving the files
-        sessions: Different sessions.
-        stack: Whether stack the signals or not.
+        sessions: First or second session 
+        stack: Whether to stack the signals or not
 
     output:
+        numpy array: (frames,feature_size)
+        
 
-    procedure:
+This file will generate cubes of speech features. The procedure is as follows:
 
-        This file will generate cube of features. The procedure is as follows:
-
-        1- The search will be done per id, i.e., for each id all the associate files
+        1- The search will be done per id, i.e., for each id all of the associated files
            with specific characteristics(belonging to which year or session) will be found.
-           Per id operations is due to usage of parallel computing.
-           * The search is done for finding the sound files which been preprocessed(VAD and re-sampled)
-             By MATLAB which have 'preprocessed' string in their file-names.
+           The search is done to find the sound files that have been pre-processed (VAD and re-sampled)
+           by MATLAB and have 'preprocessed' string in their file names.
 
-        2- For each found sound file, the wave will be read and stacking frames will be done
-           using "processing.Stack_Frames".
+        2- Each sound file will be read and stacking of the frames will be done using "processing.Stack_Frames".
 
-        3- For each stacked sequence of frames, the feature vectors(static, first and second order
+        3- For each stacked sequence of frames, the feature vectors(static, first, second order
            derivatives) will be extracted with shape: (frames,feature_size). The feature_size will
            be called Mels because it is associated with the number of chosen mel-frequencies.
 
-        4- Using the three aforementioned features, the feature cube will be generated with
-           the (frames, Mels ,Channels) dimensions which will be re-ordered to
+        4- Using the static feature and derivatives, the feature cube will be generated with
+           (frames, Mels ,Channels) dimensions but will be re-ordered to
            (Channels, Mels ,frames) for convenience.
 
         5- The final cube shape is (Channels, Mels ,frames) == (channel,height,width).
            * Mels is the number of filterbanks/specific frequencies.
-           * Channels fill like the following:
+           * Channels contain the following:
               channel[0]: static features
               channel[1]: first order derivatives
               channel[2]: second order derivatives
-
     """
     normalize_status = True
     for session in sessions:
-        # TODO: Generating Genuine pairs
-
-        # Nuemann and Neumann have different spelling in 2014 and 2015 folders!!!!
+        
+        # Generating Genuine pairs
+        # Nuemann and Neumann have different spelling in 2014 and 2015 folders
+        
         if '2014' in session:
             file_names = glob.glob(os.path.join(src_folder, str(id), session,'Nuemann Mic','Audio_VAD','*.wav'))
                                                 # '*VAD.wav'))  # Get the all image names in the source folder and its subfolders.
@@ -67,20 +64,19 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
         else:
             file_names = glob.glob(os.path.join(src_folder, str(id), session, 'Neumann Mic', 'Audio_VAD', '*.wav'))
 
-        # Looping through all the files
+        # Looping through all of the files
         for file_name in file_names:
 
             try:
-
-                # Reading the signal
+                # Read the signal
                 fs, signal = wav.read(file_name)
                 signal = signal.astype(float)
-
-
+                
                 # Normalize signal
                 if normalize_status:
                     signal = signal / 32767
                     # print(signal)
+                    
                 # Get the id name
                 ID_name = os.path.basename(file_name).split('_')[0]
 
@@ -89,20 +85,19 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
                 if not os.path.exists(ID_Folder):
                     os.makedirs(ID_Folder)
 
-                # # TODO: stack frames
+                # Stack frames
                 # if choice_stack == 'YES':
                 #     frame_length = 0.020
                 #     overlap_factor = 0.0
                 #     signal = processing.Stack_Frames(signal, fs, frame_length, overlap_factor,
                 #                                      Filter=lambda x: np.ones((x,)),
                 #                                      zero_padding=True)
-                # print('doo')
+                
                 if feature_type == 'MFEC':
                     #MFEC Features---------------
                     static_feature = speechpy.feature.lmfe(signal, fs, frame_length=0.025, frame_stride=0.010, num_filters=40,
                                   fft_length=512, low_frequency=0, high_frequency=None)
                     # print(static_feature)
-
 
                 elif feature_type == 'MFCC':
                     # #MFCC Features----------------------
@@ -111,8 +106,8 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
                 else:
                     static_feature = signal
 
-                # TODO: Feature Extraction
-                #static_feature = ExtractFeature(signal, fs, feature_type)
+                # Feature Extraction
+                # static_feature = ExtractFeature(signal, fs, feature_type)
                 feature = speechpy.feature.extract_derivative_feature(static_feature)
                 # first_derivative_feature = processing.Derivative_Feature_Fn(static_feature, DeltaWindows=2)
                 # second_derivative_feature = processing.Derivative_Feature_Fn(first_derivative_feature, DeltaWindows=2)
@@ -124,7 +119,7 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
                 #     axis=2)
                 # print(feature.shape)
 
-                # TODO: Reorder the dimension in a way to maintain locality.
+                # Reorder the dimension in a way to maintain locality
                 # the (frames, Mels ,Channels) dimensions which will be re-ordered to (Channels, Mels ,frames).
                 feature_cube = np.transpose(feature, (2, 1, 0))
                 print(feature_cube.shape)
@@ -137,10 +132,8 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
                 # # For writing the last index change faster(order: 'C'). It means the frames dimension
                 # # will be write first.
                 # feature_cube = np.reshape(feature_flat, (feature.shape[2], feature.shape[1], feature.shape[0]), 'C')
-
-
-
-                # Save the features of all files associated with a specific id, in the specific forlder.
+                
+  # Save the features of all files associated with a specific id, in the specific forlder.
 
                 # # Uncomment if saving original features is necessary
                 # np.save(os.path.join(ID_Folder, os.path.basename(file_name).split('.')[0]) + '_' + 'raw',
@@ -153,6 +146,7 @@ def Gen_Feature_Speech(id, src_folder, dst_folder, sessions, choice_stack, featu
                 #            first_derivative_feature)
                 # np.save(os.path.join(ID_Folder, os.path.basename(file_name).split('.')[0])+'_'+'DeltaSquare',
                 #            second_derivative_feature)
+                
                 output_file_name = os.path.join(ID_Folder, os.path.basename(file_name).split('.')[0])
                 np.save(output_file_name,
                         feature_cube)
