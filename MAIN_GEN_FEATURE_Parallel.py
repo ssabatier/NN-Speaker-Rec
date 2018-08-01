@@ -1,10 +1,9 @@
 """
 This file is the main file for generating features using parallel computing.
-This file do the follwoing chronologically:
-   1. Get the source folder's files.(Which have the specified IDs)
-   2. Align the images based on a "base_image".
-   3. Extract the features(HoG) according to the defined parameters.
-   4. Save the HoG features using numpy format and with the same file name as original file.
+This file does the following:
+   1. Get the source folder's files
+   2. Extract speech features with defined parameters
+   4. Save the features using numpy format and with the same file name as original file
 
 The functions that will be called within this file are:
     "gather_Gen_feature_data"
@@ -35,11 +34,8 @@ num_cores = num_cores_max - 2
 """
 GUI Class definition
 """
-
-
 # class MyButtons(QtGui.QDialog):
 #     """"""
-#
 #     def __init__(self, choices, title):
 #         # Initialized and super call.
 #         super(MyButtons, self).__init__()
@@ -91,20 +87,16 @@ GUI Class definition
 #         self.retStatus = 4
 #         self.close()
 #         self.choice = self.choice[3]
-
-
 # """
 # GUI for training or testing phase.
 # """
 # app = QtGui.QApplication(sys.argv)
 # user_options = ['YES', 'NO', 'Cancel', 'Continue']
-# task_title = 'Do you want to stack frames??!'
+# task_title = 'Do you want to stack frames?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_stack = form.choice
 choice_stack = 'NO'
-
-
 # # If user canceled the operation.
 #
 # if choice_stack == 'Cancel':
@@ -114,15 +106,14 @@ choice_stack = 'NO'
 # GUI for getting the type of features.
 # """
 # user_options = ['logfbank_energy', 'fbank_energy', 'MFCC', 'raw']
-# task_title = 'With which features do you want to create pairs?!'
+# task_title = 'With which features would you like to create pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_feature = form.choice
 choice_feature = 'MFEC'
 #
-#
-# # Which year?
-# year = str(integerbox(msg='Which year you want to extract the associated features?', title='Extracting Features',
+# 
+# year = str(integerbox(msg='From which year would you like to extract features?', title='Extracting Features',
 #                   default='2014', lowerbound=2014, upperbound=2015))
 year = '2014'
 """
@@ -134,7 +125,6 @@ DST_FOLDER = 'FEATURES' + '/' + choice_feature
 # Creating the directory.
 if not os.path.exists(DST_FOLDER):
     os.makedirs(DST_FOLDER)
-
 
 # Load IDs
 if year== '2014':
