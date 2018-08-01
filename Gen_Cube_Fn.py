@@ -31,20 +31,20 @@ This file will generate cube of features. The procedure is as follows:
 
 def Generate_Cube(id, src_folder, dst_folder, years, choice_phase, choice_feature, sessions, number_frames, overlap_stride):
 
-    # TODO: Getting all the file names.
+    # Get all the file names
     feature_names_all = glob.glob(os.path.join(src_folder, choice_feature, str(id), str(
-        id) + '*.npy')) # Get the all numpy files in the source folder and its subfolders.
+        id) + '*.npy')) # Get all numpy files in the source folder and its subfolders
 
 
     # Check if the image belongs to the desired year and session if not.
     for feature_name in feature_names_all:
         # if '*rainbow_VAD.npy' or '*0003_VAD.npy' in feature_names_all:
         if any(year in os.path.basename(feature_name).split('_')[1] for year in years):
-
-            # We loop over each session to save the files in different sessions in similar but distinguishable names.
-            # So the ids which apear in both session of a year will be saved as the last element of their name is an
-            # identical number like "1" or "2" and however since the session name is saved too, so their name is different
-            # using the different session name.
+             """
+             Loop over each session to save the files in different sessions in similar but distinguishable names.
+             So the ids which appear in both session of a year will be saved as the last element of their name is an
+             identical number like "1" or "2"
+             """             
             for session in sessions:
                 if session in os.path.basename(feature_name).split('_')[1]:
                     if 'rainbow_VAD' in feature_name or '0004_VAD' in feature_name:
@@ -71,16 +71,16 @@ def Generate_Cube(id, src_folder, dst_folder, years, choice_phase, choice_featur
                         # Number of stack is the number of stack of frames which form a block of data.
                         # For example: A 1-second block of data almost have 98 frames and the number of
                         # 1-second block of data in the stacked signal equals to whole number of frames
-                        # divided by the number of frames per block.
+                        # divided by the number of frames per block
                         number_stack = int(numpy.floor(number_all_frames / number_frames))
 
                         for i in range(number_stack):
 
-                            # Get frame_feature_cube: The cube of features per sound file duration(ex: 1s sound file has 98 frames)
+                            # Get frame_feature_cube: The cube of features per sound duration(ex: 1s sound file has 98 frames)
                             frame_feature_cube = feature_cube[ :, :,i * overlap_stride: i * overlap_stride + number_frames]
                             print("frame_feature_cube.shape", frame_feature_cube.shape)
 
-                            # Save with the appropriate naming convention.
+                            # Save with the appropriate naming convention
                             # if file_choice == 'rainbow':
                             numpy.save(os.path.join(dst_folder, id_folder,
                                                     choice_phase + '_' + choice_feature + '_' + 'cube' + '_' + str(
