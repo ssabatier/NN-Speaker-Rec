@@ -24,7 +24,7 @@ num_cores = multiprocessing.cpu_count()
 # """
 # app = QtGui.QApplication(sys.argv)
 # user_options = ['TRAIN', 'TEST', 'Cancel', 'Continue']
-# task_title = 'Are you intended to create testing or training pairs?!'
+# task_title = 'Do you intend to create testing or training pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_phase = form.choice
@@ -38,7 +38,7 @@ choice_phase = 'TEST'
 # GUI for getting the type of features.
 # """
 # user_options = ['logfbank_energy', 'MFEC', 'MFCC', 'raw']
-# task_title = 'From which kind of features you want to create pairs?!'
+# task_title = 'From which features would you like to create pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice_feature = form.choice
@@ -47,28 +47,24 @@ choice_feature = 'raw'
 # """
 # GUI for getting the session.
 # """
-# user_options = ['Speech_Aligned', 'Speech_Not_Aligned', 'IDC', 'Cancel']
-# task_title = 'How do you want to create genuine pairs?!'
+# user_options = ['Speech_Aligned', 'Speech_Not_Aligned', 'Cancel']
+# task_title = 'Would you like speech aligned?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 # choice = form.choice
 # if choice == 'Speech_Aligned':
 #     speech_aligned = True
-#     print "speech_aligned corresponds to ASR"
 # elif choice == 'Speech_Not_Aligned':
 #     speech_aligned = False
-#     print "Speech_Not_Aligned corresponds to SRE"
 # else:
 #     sys.exit('cancelled by the user')
 speech_aligned = False
 
-
 # # Number of frames per each feature cube
 # number_frames = integerbox(
-#     msg='What number of frames you want to use(it is determined base on the frame length and overlap)?',
+#     msg='How many frames would you like to use?',
 #     title='Extracting Features',
 #     default=98, lowerbound=0, upperbound=1000)
-
 
 """
 Part 2: Generating Pairs
@@ -146,7 +142,7 @@ test_id_list_imp = test_id_imp.tolist()
 
 id_set = [f for f in os.listdir(SRC_FOLDER) if os.path.isdir(os.path.join(SRC_FOLDER, f))]
 
-# TODO: Calling multiple processors for creating pairs
+# Create Pairs
 if choice_phase == 'TEST':
     for ID in test_id_list_gen:
         Generate_Genuine(ID, SRC_FOLDER, DST_FOLDER_TEST,
