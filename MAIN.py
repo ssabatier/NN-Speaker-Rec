@@ -20,14 +20,11 @@ num_cores = multiprocessing.cpu_count()
 
 """
 # GUI Class definition
-# """
-#
-#
 # class MyButtons(QtGui.QDialog):
 #     """"""
 #
 #     def __init__(self, choices, title):
-#         # Initialized and super call.
+#         # Initialized and super call
 #         super(MyButtons, self).__init__()
 #         self.initUI(choices, title)
 #         self.choice = choices
@@ -48,7 +45,7 @@ num_cores = multiprocessing.cpu_count()
 #         buttonBox.addButton(option2Button, QtGui.QDialogButtonBox.ActionRole)
 #         buttonBox.addButton(option3Button, QtGui.QDialogButtonBox.ActionRole)
 #         buttonBox.addButton(option4Button, QtGui.QDialogButtonBox.ActionRole)
-#         #
+#         
 #         mainLayout = QtGui.QVBoxLayout()
 #         mainLayout.addWidget(buttonBox)
 #
@@ -78,48 +75,49 @@ num_cores = multiprocessing.cpu_count()
 #         self.close()
 #         self.choice = self.choice[3]
 #
-#
 # """
+
 # GUI for training or testing phase.
 # """
 # app = QtGui.QApplication(sys.argv)
 # user_options = ['train', 'test', 'Cancel', 'Continue']
-# task_title = 'Are you intended to create testing or training pairs?!'
+# task_title = 'Do you wish to create testing or training pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 choice_phase = 'test'
-#
+
 # # If user canceled the operation.
 # if choice_phase == 'Cancel':
 #     sys.exit("Canceled by the user")
 #
 # """
-# GUI for getting the type of features.
+
+# GUI for getting the type of features
 # """
 # user_options = ['logfbank_energy', 'fbank_energy', 'MFCC', 'raw']
-# task_title = 'From which kind of features you want to create pairs?!'
+# task_title = 'With which features would you like to make pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 choice_feature = 'raw'
-#
 # """
-# GUI for getting the session.
+
+# GUI for getting the session
 # """
 # user_options = ['first', 'second', 'both', 'Cancel']
-# task_title = 'From which session of the year you want to create pairs?!'
+# task_title = 'From which session would you like to create pairs?'
 # form = MyButtons(choices=user_options, title=task_title)
 # form.exec_()
 choice_session = 'both'
 # user_options = ['rainbow', 'subject', 'both']
 choice_file = 'rainbow'
-#
 # """
+
 # GUI for getting the year for training.
 # """
 if choice_phase == 'train':
     TRAIN_YEARS = []
     user_options = ['2014', '2015', 'both', 'Cancel']
-    # task_title = 'From which year you want to create pairs for training?!'
+    # task_title = 'From which year would you like to create pairs for training?'
     # form = MyButtons(choices=user_options, title=task_title)
     # form.exec_()
     choice_year = 'both'
@@ -131,17 +129,16 @@ if choice_phase == 'train':
         TRAIN_YEARS.append(user_options[0])
         TRAIN_YEARS.append(user_options[1])
     else:
-        sys.exit("Cancelled by the user!")
+        sys.exit("Canceled by the user!")
     YEARS = TRAIN_YEARS
-#
 # """
+
 # GUI for getting the year for testing.
 # """
 if choice_phase == 'test':
-
     TEST_YEARS = []
     user_options = ['2014', '2015', 'both', 'Cancel']
-    # task_title = 'From which year you want to create pairs for testing?!'
+    # task_title = 'From which year would you like to create pairs for testing?!'
     # form = MyButtons(choices=user_options, title=task_title)
     # form.exec_()
     choice_year = '2015'
@@ -153,22 +150,22 @@ if choice_phase == 'test':
         TEST_YEARS.append(user_options[0])
         TEST_YEARS.append(user_options[1])
     else:
-        sys.exit("Cancelled by the user!")
+        sys.exit("Canceled by the user!")
     YEARS = TEST_YEARS
 
 ## Number of frames per each feature cube
 # number_frames = integerbox(
-#     msg='What number of frames you want to use(it is determined base on the frame length and overlap)?',
+#     msg='How many frames do you want to use?',
 #     title='Extracting Features',
 #     default=98, lowerbound=0, upperbound=1000)
 
 # number_frames is the number of frames or samples (for raw data) that we want cut to make cubes
-# Ex. for 16k sampling rate, number_frames = 6400 corresponds to 400 ms chunks of data
+# Ex. For 16k sampling rate, number_frames = 6400 corresponds to 400 ms chunks of data
 number_frames = 6400
 
 # If the stride is equal to number_frames, then there is no overlap.
 # overlap_stride = integerbox(
-#     msg='What is the stride in the sense of having overlap)?',
+#     msg='What is the stride?',
 #     title='Extracting Features',
 #     default=number_frames, lowerbound=0, upperbound=1000)
 overlap_stride = 6400
@@ -177,7 +174,6 @@ overlap_stride = 6400
 Part 2: Generating Pairs
 """
 SRC_FOLDER = '/home/stallone/Documents/PyCharm_Scripts/speech_processing-master/1-GenerateFeatures/FEATURES'
-
 dst_origin = '/home/stallone/Documents/PyCharm_Scripts/speech_processing-master/2-CreateCubes/'
 DST_FOLDER_TRAIN = dst_origin + 'CUBES/' + choice_feature + '/TRAIN'
 DST_FOLDER_TEST = dst_origin + 'CUBES/' + choice_feature + '/TEST'
@@ -185,7 +181,6 @@ DST_FOLDER_TEST = dst_origin + 'CUBES/' + choice_feature + '/TEST'
 """
 GUI for removing the files that have been generated previously.
 """
-
 # a = QApplication(sys.argv)
 # # The QWidget widget is the base class of all user interface objects in PyQt4.
 # w = QWidget()
@@ -207,7 +202,7 @@ if choice_phase == 'train':
         if os.path.exists(DST_FOLDER_TRAIN):
             os.system("rm -rf %s" % DST_FOLDER_TRAIN)
 
-    # Creating the directory.
+    # Create the directory.
     if not os.path.exists(DST_FOLDER_TRAIN):
         os.makedirs(DST_FOLDER_TRAIN)
 else:
@@ -216,7 +211,7 @@ else:
         if os.path.exists(DST_FOLDER_TEST):
             os.system("rm -rf %s" % DST_FOLDER_TEST)
 
-    # Creating the directory.
+    # Create the directory.
     if not os.path.exists(DST_FOLDER_TEST):
         os.makedirs(DST_FOLDER_TEST)
 
@@ -251,7 +246,6 @@ test_id_list = test_id.tolist()
 # un_2015R = numpy.unique(ID_2015_R)
 # id_2015_overlap = numpy.intersect1d(ID_2015_L, ID_2015_R)
 
-
 """
 Get the sessions and return them as a list.
 """
@@ -277,7 +271,7 @@ elif choice_session == 'both':
 else:
     sys.exit("Cancelled by the user at line 256!")
 
-# TODO: Calling multiple processors for creating pairs
+# Call multiple processors for creating pairs
 if choice_phase == 'test':
     for ID in test_id_list:
         Generate_Cube(ID, SRC_FOLDER, DST_FOLDER_TEST, YEARS,
